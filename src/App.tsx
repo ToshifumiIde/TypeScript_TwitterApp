@@ -31,11 +31,11 @@ const App: React.FC = () => {
   return (
     <>
       {user.uid ? (
-          <Auth />
-      ) : (
         <div className={styles.app}>
           <Feed />
         </div>
+      ) : (
+        <Auth />
       )}
     </>
   );
