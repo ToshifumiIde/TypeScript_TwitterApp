@@ -160,6 +160,21 @@ const Auth: React.FC = () => {
             >
               {isLogin ? "ログイン" : "ご登録"}
             </Button>
+            <Grid container>
+              <Grid item xs={6}>
+                <span className={styles.login_reset} onClick={() => {}}>
+                  パスワードをお忘れですか？
+                </span>
+              </Grid>
+              <Grid item xs={6}>
+                <span
+                  className={styles.login_toggleMode}
+                  onClick={() => setIsLogin(!isLogin)}
+                >
+                  {isLogin ? "アカウントを新たに作成" : "ログイン画面に移動"}
+                </span>
+              </Grid>
+            </Grid>
             <Button
               fullWidth
               variant="contained"
