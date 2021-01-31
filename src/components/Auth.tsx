@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./Auth.module.css";
 import { useDispatch } from "react-redux";
+import { updateUserProfile } from "../features/userSlice";
 import { auth, provider, storage } from "../config/firebase";
 import {
   Avatar,
@@ -46,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
   },
   image: {
     backgroundImage:
-      "url(https://images.unsplash.com/photo-1585399000684-d2f72660f092?ixid=MXwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1400&q=60)",
+      "url(https://images.unsplash.com/photo-1497215842964-222b430dc094?ixid=MXwxMjA3fDB8MHxzZWFyY2h8Mzh8fGJ1c2luZXNzfGVufDB8fDB8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60)",
     backgroundRepeat: "no-repeat",
     backgroundColor:
       theme.palette.type === "light"
@@ -78,18 +79,56 @@ const Auth: React.FC = () => {
   const classes = useStyles();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [username, setUserName] = useState<string>("");
+  const [avatarImage, setAvatarImage] = useState<File | null>(null);
   const [isLogin, setIsLogin] = useState<boolean>(true);
 
   const signInEmail = async () => {
     await auth.signInWithEmailAndPassword(email, password);
   };
   const signUpEmail = async () => {
-    await auth.createUserWithEmailAndPassword(email, password);
+    const authUser = await auth.createUserWithEmailAndPassword(email, password);
+    let url = "";
+    if (avatarImage) {
+      const S =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      const N = 16;
+      const randomChar = Array.from(crypto.getRandomValues(new Uint32Array(N)))
+        .map((n) => S[n % S.length])
+        .join("");
+      const fileName = randomChar + "_" + avatarImage.name;
+      //firebaseの仕様で、元々あったファイル名と同様のファイル名が存在すると元々あったファイルが削除される。
+      //したがって、上記4つの処理を用いてユニークのfileNameを生成する
+      await storage.ref(`avatars/${fileName}`).put(avatarImage);
+      //生成したfileNameを用いて、refを生成し、avatarImageを.put()メソッドを用いて格納する
+      url = await storage.ref("avatars").child(fileName).getDownloadURL();
+      //.getDownloadURL()で今格納した画像URLを取得可能
+    }
+    await authUser.user?.updateProfile({
+      displayName: username,
+      photoURL: url,
+      //firebaseが持つ.updateProfile()を用いて、authUserが持っているdisplayNameとphotoUrlを更新する
+    });
+    dispatch(
+      updateUserProfile({
+        displayName: username,
+        photoUrl: url,
+      })
+    );
   };
   const signInGoogle = async () => {
     await auth.signInWithPopup(provider).catch((err) => {
       alert(err.message);
     });
+  };
+  const onChangeImageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files![0]) {
+      setAvatarImage(e.target.files![0]);
+      //TypeScriptのNon-Nullアサーションオペレーター
+      //TypeScriptのコンパイラにnullまたはundefinedを追記することになる
+      //nullではないと明示するために!をつける
+      e.target.value = "";
+    }
   };
   return (
     <Grid container component="main" className={classes.root}>
@@ -166,7 +205,7 @@ const Auth: React.FC = () => {
                   パスワードをお忘れですか？
                 </span>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={false}>
                 <span
                   className={styles.login_toggleMode}
                   onClick={() => setIsLogin(!isLogin)}
