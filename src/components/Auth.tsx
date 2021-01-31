@@ -124,6 +124,7 @@ const Auth: React.FC = () => {
   };
   const onChangeImageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files![0]) {
+      console.log(e.target.files![0]);
       setAvatarImage(e.target.files![0]);
       //TypeScriptのNon-Nullアサーションオペレーター
       //TypeScriptのコンパイラにnullまたはundefinedを追記することになる
@@ -218,6 +219,11 @@ const Auth: React.FC = () => {
               variant="contained"
               color="primary"
               className={classes.submit}
+              disabled={
+                isLogin
+                  ? !email || password.length < 6
+                  : !username || !email || password.length < 6 || !avatarImage
+              }
               startIcon={<EmailIcon />}
               onClick={
                 isLogin
