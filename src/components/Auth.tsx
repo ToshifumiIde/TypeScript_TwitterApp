@@ -83,6 +83,21 @@ const Auth: React.FC = () => {
   const [username, setUserName] = useState<string>("");
   const [avatarImage, setAvatarImage] = useState<File | null>(null);
   const [isLogin, setIsLogin] = useState<boolean>(true);
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [resetEmail, setResetEmail] = useState("");
+
+  const sendResetEmail = async (e: React.MouseEvent<HTMLElement>) => {
+    await auth
+      .sendPasswordResetEmail(resetEmail)
+      .then(() => {
+        setOpenModal(false);
+        setResetEmail("");
+      })
+      .catch((err) => {
+        alert(err.message);
+        setResetEmail("");
+      });
+  };
 
   const signInEmail = async () => {
     await auth.signInWithEmailAndPassword(email, password);
@@ -247,7 +262,12 @@ const Auth: React.FC = () => {
             </Button>
             <Grid container>
               <Grid item xs={6}>
-                <span className={styles.login_reset} onClick={() => {}}>
+                <span
+                  className={styles.login_reset}
+                  onClick={() => {
+                    setOpenModal(true);
+                  }}
+                >
                   パスワードをお忘れですか？
                 </span>
               </Grid>
