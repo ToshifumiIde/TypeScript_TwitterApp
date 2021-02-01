@@ -27,31 +27,31 @@ const TweetInput = () => {
       const N = 16;
       const randomChar = Array.from(crypto.getRandomValues(new Uint32Array(N)))
         .map((n) => S[n % S.length])
-        .join("");//.join("")メソッドで文字を結合する
+        .join(""); //.join("")メソッドで文字を結合する
       const fileName = randomChar + "_" + tweetImage.name;
       const uploadTweetImage = storage
         .ref(`images/${fileName}`)
-        .put(tweetImage);//ランダムで生成したfile名のリファレンスにtweetImageを格納する
+        .put(tweetImage); //ランダムで生成したfile名のリファレンスにtweetImageを格納する
       uploadTweetImage.on(
         firebase.storage.TaskEvent.STATE_CHANGED,
         () => {}, //プログレスに関しては特に実行しないため空の関数を格納
         (err) => {
           alert(err.message);
         }, //エラー発生時はアラートで表示
-        async () =>{
+        async () => {
           await storage
             .ref("images")
             .child(fileName)
             .getDownloadURL()
-            .then(async (url)=>{
+            .then(async (url) => {
               await db.collection("posts2").add({
-                avatar:user.photoUrl,
-                image:tweetImage,
-                text:tweetMessage,
-                timestamp:firebase.firestore.FieldValue.serverTimestamp(),
-                username:user.displayName,
-              })
-            })
+                avatar: user.photoUrl,
+                image: url,
+                text: tweetMessage,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                username: user.displayName,
+              });
+            });
         }
       );
     } else {
