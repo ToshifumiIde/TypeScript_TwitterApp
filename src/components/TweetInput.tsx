@@ -3,9 +3,11 @@ import styles from "./TweetInput.module.css";
 import { useSelector } from "react-redux";
 import { selectUser } from "../features/userSlice";
 import { auth, db, storage } from "../config/firebase";
-import { Avatar } from "@material-ui/core";
+import { Avatar, Button, IconButton } from "@material-ui/core";
 import firebase from "firebase/app";
+import AddPhotoIcon from "@material-ui/icons/AddAPhoto";
 //dbにタイムスタンプを格納する.serverTimestamp()メソッドを使用するためにfirebaseのimportが必要
+
 const TweetInput = () => {
   const user = useSelector(selectUser);
   //react-reduxの機能を用いてuser情報を取得
@@ -66,15 +68,52 @@ const TweetInput = () => {
   };
 
   return (
-    <div>
-      <Avatar
-        className={styles.tweet_avatar}
-        src={user.photoUrl}
-        onClick={async () => {
-          await auth.signOut();
-        }} //サインアウトの実行をアバターのクリックで実行
-      />
-    </div>
+    <>
+      <form onSubmit={sendTweet}>
+        <div className={styles.tweet_form}>
+          <Avatar
+            className={styles.tweet_avatar}
+            src={user.photoUrl}
+            onClick={async () => {
+              await auth.signOut();
+            }} //サインアウトの実行をアバターのクリックで実行
+          />
+          <input
+            className={styles.tweet_input}
+            type="text"
+            placeholder="つぶやいてみよう"
+            autoFocus
+            value={tweetMessage}
+            onChange={(e) => {
+              setTweetMessage(e.target.value);
+            }}
+          />
+          <IconButton>
+            <label>
+              <AddPhotoIcon
+                className={
+                  tweetImage ? styles.tweet_addIconLoaded : styles.tweet_addIcon
+                }
+              />
+              <input
+                className={styles.tweet_hiddenIcon}
+                type="file"
+                onChange={onChangeImageHandler}
+              />
+            </label>
+          </IconButton>
+        </div>
+        <Button
+          type="submit"
+          disabled={!tweetMessage}
+          className={
+            tweetImage ? styles.tweet_sendBtn : styles.tweet_sendDisableBtn
+          }
+        >
+          つぶやく
+        </Button>
+      </form>
+    </>
   );
 };
 
