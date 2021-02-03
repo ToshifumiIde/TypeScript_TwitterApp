@@ -5,10 +5,10 @@ import { selectUser } from "../features/userSlice";
 import { auth, db, storage } from "../config/firebase";
 import { Avatar, Button, IconButton } from "@material-ui/core";
 import firebase from "firebase/app";
+//dbにタイムスタンプを格納するfirebase.firestore.FieldValue.serverTimestamp()メソッドを使用するためにfirebaseのimportが必要
 import AddPhotoIcon from "@material-ui/icons/AddAPhoto";
-//dbにタイムスタンプを格納する.serverTimestamp()メソッドを使用するためにfirebaseのimportが必要
 
-const TweetInput = () => {
+const TweetInput: React.FC = () => {
   const user = useSelector(selectUser);
   //react-reduxの機能を用いてuser情報を取得
   const [tweetMessage, setTweetMessage] = useState<string>("");
@@ -29,11 +29,12 @@ const TweetInput = () => {
       const N = 16;
       const randomChar = Array.from(crypto.getRandomValues(new Uint32Array(N)))
         .map((n) => S[n % S.length])
-        .join(""); //.join("")メソッドで文字を結合する
-      const fileName = randomChar + "_" + tweetImage.name;
+        .join(""); //.join("")メソッドでarrayの要素（文字）を結合し、文字列としてrandomCharに格納
+      const fileName = randomChar + "_" + tweetImage.name;//fileNameにランダム文字列と画像名を結合した文字列を格納
       const uploadTweetImage = storage
-        .ref(`images/${fileName}`)
+        .ref(`images2/${fileName}`)
         .put(tweetImage); //ランダムで生成したfile名のリファレンスにtweetImageを格納する
+
       uploadTweetImage.on(
         firebase.storage.TaskEvent.STATE_CHANGED,
         () => {}, //プログレスに関しては特に実行しないため空の関数を格納
@@ -42,7 +43,7 @@ const TweetInput = () => {
         }, //エラー発生時はアラートで表示
         async () => {
           await storage
-            .ref("images")
+            .ref("images2")
             .child(fileName)
             .getDownloadURL()
             .then(async (url) => {
@@ -65,6 +66,9 @@ const TweetInput = () => {
         username: user.displayName,
       }); //dbの中に新たに"posts2"collectionを作成し、add()メソッドでtweet情報のオブジェクトを渡す
     }
+    setTweetMessage("");
+    setTweetImage(null);
+    console.log("submit");
   };
 
   return (
@@ -107,7 +111,7 @@ const TweetInput = () => {
           type="submit"
           disabled={!tweetMessage}
           className={
-            tweetImage ? styles.tweet_sendBtn : styles.tweet_sendDisableBtn
+            tweetMessage ? styles.tweet_sendBtn : styles.tweet_sendDisableBtn
           }
         >
           つぶやく
