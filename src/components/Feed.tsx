@@ -41,18 +41,22 @@ const Feed: React.FC = () => {
     <div className={styles.feed}>
       Feed
       <TweetInput />
-      {posts.map((post) => (
-        // <h3>{post.id}</h3>
-        <Post 
-          key={post.id} 
-          postId={post.id}
-          avatar={post.avatar}
-          image={post.image}
-          text={post.text}
-          timestamp={post.timestamp}
-          username={post.username}
-          />
-      ))}
+      {posts[0]?.id && (
+        <>
+          {posts.map((post) => (
+            // <h3>{post.id}</h3>
+            <Post
+              key={post.id}
+              postId={post.id}
+              avatar={post.avatar}
+              image={post.image}
+              text={post.text}
+              timestamp={post.timestamp}
+              username={post.username}
+            />
+          ))}
+        </>
+      )}
       <button
         onClick={() => {
           auth.signOut();
