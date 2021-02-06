@@ -19,10 +19,49 @@ interface PROPS {
 }
 //TypeScriptの場合、propsのデータ型を定義する必要がある。interface ○○{}で定義
 
+interface COMMENT {
+  id: string;
+  avatar: string;
+  text: string;
+  timestamp: any;
+  username: string;
+}
+
 const Post: React.FC<PROPS> = (props) => {
   //上記で定義したPROPSの型をアロー関数定義時に渡す
   const user = useSelector(selectUser);
   const [comment, setComment] = useState<string>("");
+  const [comments, setComments] = useState<COMMENT[]>([
+    {
+      id: "",
+      avatar: "",
+      text: "",
+      username: "",
+      timestamp: null,
+    },
+  ]);
+
+  useEffect(() => {
+    const unSub = db
+      .collection("posts2")
+      .doc(props.postId)
+      .collection("comments")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) => {
+        setComments(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            avatar: doc.data().avatar,
+            text: doc.data().text,
+            username: doc.data().username,
+            timestamp: doc.data().timestamp,
+          }))
+        );
+      });
+    return () => {
+      unSub();
+    };
+  }, [props.postId]);
 
   const newComment = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
@@ -58,7 +97,7 @@ const Post: React.FC<PROPS> = (props) => {
         </div>
         {props.image && (
           <div className={styles.post_tweetImage}>
-            <img src={props.image} alt="tweetimage" />
+            <img src={props.image} alt="tweetImage" />
           </div>
         )}
         <form action="" onSubmit={newComment}>
