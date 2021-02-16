@@ -19,12 +19,12 @@ const Feed: React.FC = () => {
   useEffect(() => {
     const unSub = db
       .collection("posts2")
-      .orderBy("timestamp", "desc") //並べ替えをtimestampのdocs(降順)で実施することで、最新のものが先頭に来る
+      .orderBy("timestamp", "desc")
       .onSnapshot((snapshot) => {
         setPosts(
           snapshot.docs.map((doc) => ({
             id: doc.id,
-            avatar: doc.data().avatar, //fieldの属性に関しては、doc.data()メソッドを使用することでアクセス可能
+            avatar: doc.data().avatar,
             image: doc.data().image,
             text: doc.data().text,
             timestamp: doc.data().timestamp,
@@ -36,6 +36,8 @@ const Feed: React.FC = () => {
       unSub(); //アンマウントされた時のcleanup関数で、unSub()を実行する
     };
   }, []);
+  //fieldの属性に関しては、doc.data()メソッドを使用することでアクセス可能
+  //並べ替えをtimestampのdocs(降順)で実施することで、最新のものが先頭に来る
 
   return (
     <div className={styles.feed}>

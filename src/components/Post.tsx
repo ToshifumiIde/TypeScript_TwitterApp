@@ -61,12 +61,11 @@ const Post: React.FC<PROPS> = (props) => {
         );
       });
     return () => {
-      unSub();//アンマウントされた際のクリーンナップ関数
+      unSub(); //アンマウントされた際のクリーンナップ関数
     };
   }, [props.postId]);
   //firebaseに格納されたデータを取得する処理
   //投稿Idを第二引数に渡すことで、Idが変更される度にuseEffectが実行される
-
 
   const newComment = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
@@ -79,6 +78,7 @@ const Post: React.FC<PROPS> = (props) => {
     setComment("");
     // setComment(e.target.value);
   };
+  
   return (
     <div className={styles.post}>
       Post
@@ -105,7 +105,16 @@ const Post: React.FC<PROPS> = (props) => {
             <img src={props.image} alt="tweetImage" />
           </div>
         )}
-        
+        {comments.map((com) => (
+          <div key={com.id} className={styles.post_comment}>
+            <Avatar src={com.avatar} />
+            <span className={styles.post_commentUser}>@{com.username}</span>
+            <span className={styles.post_commentText}>{com.text}</span>
+            <span className={styles.post_headerTime}>
+              {new Date(com.timestamp?.toDate().toLocaleString())}
+            </span>
+          </div>
+        ))}
         <form action="" onSubmit={newComment}>
           <div className={styles.post_form}>
             <TextField
