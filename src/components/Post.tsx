@@ -26,6 +26,7 @@ interface COMMENT {
   timestamp: any;
   username: string;
 }
+//timestampはany型で定義
 
 const Post: React.FC<PROPS> = (props) => {
   //上記で定義したPROPSの型をアロー関数定義時に渡す
@@ -40,6 +41,7 @@ const Post: React.FC<PROPS> = (props) => {
       timestamp: null,
     },
   ]);
+  //コメントは配列で返却される。また、初期値をオブジェクトで生成
 
   useEffect(() => {
     const unSub = db
@@ -59,9 +61,12 @@ const Post: React.FC<PROPS> = (props) => {
         );
       });
     return () => {
-      unSub();
+      unSub();//アンマウントされた際のクリーンナップ関数
     };
   }, [props.postId]);
+  //firebaseに格納されたデータを取得する処理
+  //投稿Idを第二引数に渡すことで、Idが変更される度にuseEffectが実行される
+
 
   const newComment = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
@@ -100,6 +105,7 @@ const Post: React.FC<PROPS> = (props) => {
             <img src={props.image} alt="tweetImage" />
           </div>
         )}
+        
         <form action="" onSubmit={newComment}>
           <div className={styles.post_form}>
             <TextField
