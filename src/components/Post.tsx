@@ -28,8 +28,17 @@ interface COMMENT {
 }
 //timestampはany型で定義
 
+const useStyles = makeStyles((theme) => ({
+  small: {
+    width: theme.spacing(3),
+    height: theme.spacing(3),
+    marginRight: theme.spacing(1),
+  },
+}));
+
 const Post: React.FC<PROPS> = (props) => {
   //上記で定義したPROPSの型をアロー関数定義時に渡す
+  const classes = useStyles();
   const user = useSelector(selectUser);
   const [comment, setComment] = useState<string>("");
   const [comments, setComments] = useState<COMMENT[]>([
@@ -78,12 +87,12 @@ const Post: React.FC<PROPS> = (props) => {
     setComment("");
     // setComment(e.target.value);
   };
-  
+
   return (
     <div className={styles.post}>
       Post
       <div className={styles.post_avatar}>
-        <Avatar src={props.avatar} />
+        <Avatar src={props.avatar} className={classes.small}/>
       </div>
       <div className={styles.post_body}>
         <div>
